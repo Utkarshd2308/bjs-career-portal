@@ -80,7 +80,6 @@
             transition: 0.4s;
             height: 100%;
             box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-            cursor: pointer;
             text-decoration: none;
             display: block;
             color: inherit;
@@ -132,6 +131,22 @@
         .modal-content { border-radius: 20px; border: none; }
         .modal-header { background: var(--primary-gradient); color: white; border-radius: 20px 20px 0 0; }
         .list-group-item { border: none; padding: 15px 20px; margin-bottom: 5px; background: #f8fafc; border-radius: 10px !important; }
+        
+        /* Yellow Button Style for Card */
+        .btn-yellow {
+            background-color: #ffc107;
+            color: #000;
+            border: none;
+            font-weight: 600;
+            border-radius: 50px;
+            padding: 8px 20px;
+            transition: 0.3s;
+            margin-top: 15px;
+        }
+        .btn-yellow:hover {
+            background-color: #e0a800;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -216,11 +231,12 @@
                 </div>
             </div>
             <div class="col-12 col-md-12 col-lg-4">
-                <a href="placed-students.html" class="feature-card text-center">
+                <div class="feature-card text-center">
                     <div class="icon-circle bg-warning text-white"><i class="bi bi-person-check-fill"></i></div>
                     <h4>Placed Students</h4>
                     <p class="text-muted small">See the list of our successful students placed in top industries.</p>
-                </a>
+                    <a href="placed-students.html" class="btn btn-yellow">View Full List</a>
+                </div>
             </div>
         </div>
     </div>
