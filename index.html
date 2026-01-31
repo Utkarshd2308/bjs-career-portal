@@ -58,6 +58,8 @@
             box-shadow: 0 10px 20px rgba(78, 115, 223, 0.2);
             width: 100%;
             color: white;
+            text-decoration: none;
+            display: inline-block;
         }
 
         @media (min-width: 576px) {
@@ -78,6 +80,10 @@
             transition: 0.4s;
             height: 100%;
             box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            color: inherit;
         }
 
         .feature-card:hover {
@@ -123,7 +129,6 @@
             100% { transform: translateY(0px); }
         }
 
-        /* Modal Custom Styling */
         .modal-content { border-radius: 20px; border: none; }
         .modal-header { background: var(--primary-gradient); color: white; border-radius: 20px 20px 0 0; }
         .list-group-item { border: none; padding: 15px 20px; margin-bottom: 5px; background: #f8fafc; border-radius: 10px !important; }
@@ -139,7 +144,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center pt-3 pt-lg-0">
-                <li class="nav-item"><a class="nav-link px-3" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link px-3" href="index.html">Home</a></li>
                 <li class="nav-item"><a class="nav-link px-3" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">About Us</a></li>
                 <li class="nav-item mt-2 mt-lg-0 ms-lg-3 w-100 w-lg-auto">
                     <a href="login.html" class="btn btn-outline-primary rounded-pill px-4 w-100">Login</a>
@@ -211,11 +216,11 @@
                 </div>
             </div>
             <div class="col-12 col-md-12 col-lg-4">
-                <div class="feature-card text-center">
-                    <div class="icon-circle bg-warning text-white"><i class="bi bi-graph-up-arrow"></i></div>
-                    <h4>Success Analytics</h4>
-                    <p class="text-muted small">Track your application progress and placement statistics live.</p>
-                </div>
+                <a href="placed-students.html" class="feature-card text-center">
+                    <div class="icon-circle bg-warning text-white"><i class="bi bi-person-check-fill"></i></div>
+                    <h4>Placed Students</h4>
+                    <p class="text-muted small">See the list of our successful students placed in top industries.</p>
+                </a>
             </div>
         </div>
     </div>
@@ -252,8 +257,7 @@
                     <div class="spinner-border text-primary" role="status"></div>
                     <p class="mt-2 text-muted">Fetching registered partners...</p>
                 </div>
-                <div class="list-group" id="companyList">
-                    </div>
+                <div class="list-group" id="companyList"></div>
             </div>
         </div>
     </div>
@@ -300,11 +304,9 @@
         companiesModal.show();
         const listContainer = document.getElementById('companyList');
         const spinner = document.getElementById('loadingSpinner');
-        
         listContainer.innerHTML = "";
         spinner.style.display = "block";
 
-        // Query database for users with role 'Company'
         db.collection("users").where("role", "==", "Company").get()
         .then((querySnapshot) => {
             spinner.style.display = "none";
@@ -328,7 +330,6 @@
         })
         .catch((error) => {
             spinner.style.display = "none";
-            console.error("Error fetching companies: ", error);
             listContainer.innerHTML = "<p class='text-danger text-center'>Error loading data.</p>";
         });
     }
