@@ -16,6 +16,7 @@
         .role-box { border: 2px solid #e2e8f0; border-radius: 15px; padding: 15px; cursor: pointer; transition: 0.3s; height: 100%; }
         .role-box:hover, .role-box.active { border-color: #4e73df; background: #f8faff; }
         footer { background: #ffffff; border-top: 1px solid #e2e8f0; padding: 20px 0; text-align: center; font-size: 0.9rem; color: #64748b; }
+        @media (max-width: 576px) { .reg-card { padding: 25px !important; border-radius: 20px; } h2 { font-size: 1.5rem; } .role-box h5 { font-size: 1rem; } }
     </style>
 </head>
 <body>
@@ -45,13 +46,13 @@
                         <div class="row mb-4">
                             <p class="fw-bold mb-3">Join as a:</p>
                             <div class="col-6 mb-2"> 
-                                <div class="role-box text-center active" id="roleStudent" onclick="selectRole('Student')">
+                                <div class="role-box text-center active" id="studentBox" onclick="selectRole('Student')">
                                     <h5 class="mb-0">🎓 Student</h5>
                                     <small class="text-muted d-none d-md-block">Apply for jobs</small>
                                 </div>
                             </div>
                             <div class="col-6 mb-2">
-                                <div class="role-box text-center" id="roleCompany" onclick="selectRole('Company')">
+                                <div class="role-box text-center" id="companyBox" onclick="selectRole('Company')">
                                     <h5 class="mb-0">🏢 Company</h5>
                                     <small class="text-muted d-none d-md-block">Hire best talent</small>
                                 </div>
@@ -101,79 +102,77 @@
     </div>
 </footer>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-    // Your Configuration
+<script>
     const firebaseConfig = {
-        apiKey: "AIzaSyBesNn3cSSFCVnZVqeenWdX1SR0MOBji9M",
-        authDomain: "codewave-fc5b5.firebaseapp.com",
-        databaseURL: "https://codewave-fc5b5-default-rtdb.firebaseio.com", // Realtime DB साठी हे महत्त्वाचे आहे
-        projectId: "codewave-fc5b5",
-        storageBucket: "codewave-fc5b5.firebasestorage.app",
-        messagingSenderId: "136875582316",
-        appId: "1:136875582316:web:b9ed0b06589364ca690949",
-        measurementId: "G-69GP009NJ0"
+        apiKey: "AIzaSyCYt-GaHe9FN3Hk5ULWMNIVeRcOMkcKK-8",
+        authDomain: "hapan-d4d75.firebaseapp.com",
+        databaseURL: "https://hapan-d4d75-default-rtdb.firebaseio.com",
+        projectId: "hapan-d4d75",
+        storageBucket: "hapan-d4d75.firebasestorage.app",
+        messagingSenderId: "558946058796",
+        appId: "1:558946058796:web:2592756709069c5e764789",
+        measurementId: "G-9JRHTYMVPW"
     };
 
     // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const database = getDatabase(app);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
     let currentRole = "Student";
 
-    // UI Logic for Role Selection
-    window.selectRole = (role) => {
+    // Role selection handler fix
+    window.selectRole = function(role) {
+        document.getElementById('studentBox').classList.remove('active');
+        document.getElementById('companyBox').classList.remove('active');
+        
+        if(role === 'Student') {
+            document.getElementById('studentBox').classList.add('active');
+        } else {
+            document.getElementById('companyBox').classList.add('active');
+        }
         currentRole = role;
-        document.getElementById('roleStudent').classList.remove('active');
-        document.getElementById('roleCompany').classList.remove('active');
-        
-        if(role === 'Student') document.getElementById('roleStudent').classList.add('active');
-        else document.getElementById('roleCompany').classList.add('active');
-    };
+    }
 
-    // Registration Logic
-    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    // Form submission
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        
         const btn = document.getElementById('regBtn');
         const name = document.getElementById('fullName').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const phone = document.getElementById('phone').value;
 
-        // UI Feedback
         btn.innerText = "Processing...";
         btn.disabled = true;
 
-        try {
-            // १. Create User in Auth
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            // २. Save Data to Realtime Database
-            // मार्ग: users/UID
-            await set(ref(database, 'users/' + user.uid), {
+        auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            return db.collection("users").doc(userCredential.user.uid).set({
                 fullName: name,
                 email: email,
                 phone: phone,
                 role: currentRole,
-                uid: user.uid,
-                createdAt: new Date().toISOString()
+                uid: userCredential.user.uid,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-
-            alert("Account Created Successfully !!");
+        })
+        .then(() => {
+            alert("Account Created Successfully!");
             window.location.href = "login.html";
-
-        } catch (error) {
-            console.error("Error: ", error);
-            alert("Error: " + error.message);
+        })
+        .catch((error) => {
             btn.innerText = "Create Account";
             btn.disabled = false;
-        }
+            console.error("Registration Error:", error);
+            alert(error.message);
+        });
     });
 </script>
 
